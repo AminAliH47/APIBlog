@@ -23,6 +23,6 @@ urlpatterns = []
 urlpatterns += i18n_patterns(
     path('account/', include("account.urls")),
     path('', include("blog.urls")),
-    path('api/token-auth/', obtain_auth_token),
+    path('account/token-auth/', obtain_auth_token),
     path('admin/', admin.site.urls),
 )
