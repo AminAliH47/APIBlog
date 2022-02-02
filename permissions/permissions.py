@@ -20,4 +20,3 @@ class IsSuperuserOrStaffReadonly(permissions.BasePermission):
             # Full access for superusers
             request.user.is_authenticated and request.user.is_superuser
         )
-
