@@ -39,6 +39,11 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
 
+    'rest_framework_simplejwt',
+    'allauth',
+    'dj_rest_auth',
+    'dj_rest_auth.registration',
+
     'account.apps.AccountConfig',
     'blog.apps.BlogConfig',
 ]
@@ -137,6 +142,10 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.AllowAny',
     ],
     'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework.authentication.TokenAuthentication',
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
     ],
 }
+
+REST_USE_JWT = True
+JWT_AUTH_COOKIE = 'my-app-auth'
+JWT_AUTH_REFRESH_COOKIE = 'my-refresh-token'
