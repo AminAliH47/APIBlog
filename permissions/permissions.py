@@ -3,6 +3,9 @@ from rest_framework.permissions import SAFE_METHODS
 
 
 class IsSuperuserOrStaffReadonly(permissions.BasePermission):
+    """
+    The request should be superuser, or read-only just for staff user.
+    """
     message = 'You do not have permission to access.'
 
     def has_permission(self, request, view):
