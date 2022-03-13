@@ -5,8 +5,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from account.models import User
 from account.serializer import (
     UserSerializer,
-    UserLoginSerializer,
-    UserRegisterView,
+    AuthSerializer,
 )
 from permissions import permissions as cp  # Custom Permissions
 from rest_framework.views import APIView
@@ -28,14 +27,68 @@ class UserDetail(generics.RetrieveUpdateDestroyAPIView):
     authentication_classes = (JWTAuthentication,)
 
 
-class RegisterView(APIView):
+# class RegisterView(APIView):
+#     def post(self, request):
+#         serializer = UserRegisterView(
+#             data=request.data,
+#             context={'request': request},
+#         )
+#         serializer.is_valid(raise_exception=True)
+#         user = serializer.validated_data['user']
+#         update_last_login(None, user)
+#
+#         refresh = RefreshToken.for_user(user)
+#         refresh_token = str(refresh)
+#         access_token = str(refresh.access_token)
+#
+#         context = {
+#             "refresh_token": refresh_token,
+#             "access_token": access_token,
+#             "user": {
+#                 "pk": user.pk,
+#                 "username": user.username,
+#                 "email": user.email,
+#                 "first_name": user.first_name,
+#                 "last_name": user.last_name,
+#             },
+#         }
+#
+#         response = Response()
+#         response.set_cookie(key='refresh-token', value=refresh_token, httponly=True)
+#         response.set_cookie(key='access-token', value=access_token, httponly=True)
+#         response.set_cookie(key='isAuth', value=True, httponly=False)
+#         response.data = context
+#         response.status_code = 200
+#
+#         return response
+
+
+class AuthView(APIView):
+    """
+    Check if user is exists login, else register user then login
+    also user can register with email and phone number
+    """
+
     def post(self, request):
-        serializer = UserRegisterView(
+        serializer = AuthSerializer(
             data=request.data,
             context={'request': request},
         )
         serializer.is_valid(raise_exception=True)
-        user = serializer.validated_data['user']
+        username = serializer.validated_data['username']
+        password = serializer.validated_data['password']
+
+        print(username)
+
+        try:
+            user = User.objects.get(username=username)
+        except User.DoesNotExist:
+            user = User(
+                username=username,
+                password=password
+            )
+            user.save()
+
         update_last_login(None, user)
 
         refresh = RefreshToken.for_user(user)
@@ -49,9 +102,8 @@ class RegisterView(APIView):
                 "pk": user.pk,
                 "username": user.username,
                 "email": user.email,
-                "first_name": user.first_name,
-                "last_name": user.last_name,
-            },
+                "phone_number": user.phone_number,
+            }
         }
 
         response = Response()
@@ -64,44 +116,49 @@ class RegisterView(APIView):
         return response
 
 
-class LoginView(APIView):
-    """
-    User login View
-    """
+# class LoginView(APIView):
+#     """
+#     User login View
+#     """
+#
+#     def post(self, request):
+#         serializer = UserLoginSerializer(
+#             data=request.data,
+#             context={'request': request},
+#         )
+#         serializer.is_valid(raise_exception=True)
+#         user = serializer.validated_data['user']
+#         update_last_login(None, user)
+#
+#         refresh = RefreshToken.for_user(user)
+#         refresh_token = str(refresh)
+#         access_token = str(refresh.access_token)
+#
+#         context = {
+#             "refresh_token": refresh_token,
+#             "access_token": access_token,
+#             "user": {
+#                 "pk": user.pk,
+#                 "username": user.username,
+#                 "email": user.email,
+#                 "first_name": user.first_name,
+#                 "last_name": user.last_name,
+#             },
+#         }
+#
+#         response = Response()
+#         response.set_cookie(key='refresh-token', value=refresh_token, httponly=True)
+#         response.set_cookie(key='access-token', value=access_token, httponly=True)
+#         response.set_cookie(key='isAuth', value=True, httponly=False)
+#         response.data = context
+#         response.status_code = 200
+#
+#         return response
 
+
+class UserAuthentication(APIView):
     def post(self, request):
-        serializer = UserLoginSerializer(
-            data=request.data,
-            context={'request': request},
-        )
-        serializer.is_valid(raise_exception=True)
-        user = serializer.validated_data['user']
-        update_last_login(None, user)
-
-        refresh = RefreshToken.for_user(user)
-        refresh_token = str(refresh)
-        access_token = str(refresh.access_token)
-
-        context = {
-            "refresh_token": refresh_token,
-            "access_token": access_token,
-            "user": {
-                "pk": user.pk,
-                "username": user.username,
-                "email": user.email,
-                "first_name": user.first_name,
-                "last_name": user.last_name,
-            },
-        }
-
-        response = Response()
-        response.set_cookie(key='refresh-token', value=refresh_token, httponly=True)
-        response.set_cookie(key='access-token', value=access_token, httponly=True)
-        response.set_cookie(key='isAuth', value=True, httponly=False)
-        response.data = context
-        response.status_code = 200
-
-        return response
+        pass
 
 
 class LogoutView(APIView):

@@ -40,9 +40,6 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
 
     'rest_framework_simplejwt',
-    'allauth',
-    'dj_rest_auth',
-    'dj_rest_auth.registration',
 
     'account.apps.AccountConfig',
     'blog.apps.BlogConfig',
